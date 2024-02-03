@@ -1,27 +1,72 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    "target": "es5",
+    "types": [
+      "node",
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "classnameTransform": "dashes",
+          "customMatcher": "\\.module.scss$",
+          "dotenvOptions": {},
+          "postcssOptions": {},
+          "rendererOptions": {}
+        }
+      }
+    ],
+    "strict": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "jsx": "react-jsx",
     "allowJs": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
     "baseUrl": "src",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "paths": {
+      "@base/*": [
+        "components/00.base/*"
+      ],
+      "@css-variables": [
+        "components/00.base/styles/variables.scss"
+      ],
+      "@atoms/*": [
+        "components/01.atoms/*"
+      ],
+      "@molecules/*": [
+        "components/02.molecules/*"
+      ],
+      "@organisms/*": [
+        "components/03.organisms/*"
+      ],
+      "@templates/*": [
+        "components/04.templates/*"
+      ],
+      "@pages/*": [
+        "components/05.pages/*"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ],
+    }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
