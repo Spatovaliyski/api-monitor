@@ -1,41 +1,41 @@
 .detailsList {
-	display: flex;
-	flex-flow: column wrap;
-	justify-content: flex-start;
-	align-items: flex-start;
-	gap: 1em;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1em;
 
-	li {
-		list-style: none;
-		padding: 1em;
-		width: 100%;
-		text-align: left;
-		background-color: white;
-		border-radius: 6px;
-	}
+  li {
+    list-style: none;
+    padding: 1em;
+    width: 100%;
+    text-align: left;
+    background-color: white;
+    border-radius: 6px;
+  }
 }
 
 .status {
-	border: 1px solid transparent;
+  border: 1px solid transparent;
 }
 
 .box {
-	width: 16px;
-	height: 16px;
-	display: inline-block;
-	border-radius: 50%;
-	line-height: 1;
-	margin: 0 1em 0 0;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  border-radius: 50%;
+  line-height: 1;
+  margin: 0 1em 0 0;
 }
 
 .statusNone {
-	background-color: green;
+  background-color: green;
 }
 
 .statusWarning {
-	background-color: yellow;
+  background-color: yellow;
 }
 
 .statusError {
-	background-color: red;
+  background-color: red;
 }
