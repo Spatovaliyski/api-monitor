@@ -1,0 +1,44 @@
+.resultsTable {
+  border-radius: 12px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-shadow: none;
+  border: 1px solid var(--color-main-border);
+  box-shadow: none !important; // Overwrites, absolutely no shadows here
+
+  th {
+    color: var(--color-primary);
+    font-weight: 400;
+  }
+}
+
+.status {
+  border: 1px solid transparent;
+}
+
+.box {
+  display: inline-block;
+  line-height: 1;
+  margin: 0 1em 0 0;
+  padding: 5px 10px;
+  border-radius: 6px;
+  width: 100%;
+  text-align: center;
+  max-width: 64px;
+}
+
+.statusNone {
+  background-color: var(--color-success);
+  color: hsl(0, 84%, calc(var(--color-success) - 5%));
+}
+
+.statusWarning {
+  background-color: var(--color-warning);
+  color: hsl(0, 84%, calc(var(--color-warning) - 5%));
+}
+
+.statusError {
+  background-color: var(--color-error);
+  color: hsl(0, 84%, calc(var(--color-error) - 5%));
+}

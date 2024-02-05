@@ -1,29 +1,34 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { LogData, GroupedData } from './dashboard.type';
-import Chart, { CategoryScale } from 'chart.js/auto';
+import Chart, { CategoryScale, Title } from 'chart.js/auto';
 import dayjs, { Dayjs } from 'dayjs';
 
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Box, Grid, Container } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import service from '@lib/services/service';
 import styles from './dashboard.module.scss';
+import StartEndDatepicker from '@molecules/StartEndDatepicker/start-end-datepicker.component';
+import Heading from '@organisms/Heading/heading.component';
+import ResultsTable from '@organisms/ResultsTable/results-table.component';
+import ResultsSummarized from '@organisms/ResultsSummarized/results-summarized.component';
 
 // Register the category scale
 Chart.register(CategoryScale);
 
 const StackedBarGraphComponent = () => {
-  const [firstEntryTime, setFirstEntryTime] = useState<Dayjs | null>(null);
-  const [lastEntryTime, setLastEntryTime] = useState<Dayjs | null>(null);
   const [logData, setLogData] = useState<LogData[]>([]);
-  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs('2024-01-01'));
-  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs('2024-01-31').endOf('day')); // endOf = 23:59:59
-  const [sortColumn, setSortColumn] = useState<string | null>('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [firstEntryDate, setFirstEntryDate] = useState<Dayjs>(dayjs('1969-01-01'));
+  const [lastEntryDate, setLastEntryDate] = useState<Dayjs>(dayjs('2100-01-01'));
+  const [startDate, setStartDate] = useState<Dayjs>(dayjs('2024-01-01'));
+  const [endDate, setEndDate] = useState<Dayjs>(dayjs('2024-01-31').endOf('day')); // endOf = 23:59:59
+  const [summarizedData, setSummarizedData] = useState<{ success: number; warning: number; error: number }>({
+    success: 0,
+    warning: 0,
+    error: 0,
+  });
 
   /** 
    * Fetch the data from the API and filter it based on the date range
@@ -40,8 +45,8 @@ const StackedBarGraphComponent = () => {
         return logDate >= startTimestamp / 1000 && logDate <= endTimestamp / 1000;
       });
 
-      setFirstEntryTime(dayjs(res.data[0].timestamp * 1000));
-      setLastEntryTime(dayjs(res.data[res.data.length - 1].timestamp * 1000));
+      setFirstEntryDate(dayjs(res.data[0].timestamp * 1000));
+      setLastEntryDate(dayjs(res.data[res.data.length - 1].timestamp * 1000));
 
       setLogData(filteredData);
     });
@@ -51,42 +56,41 @@ const StackedBarGraphComponent = () => {
    * Transform the data to be used in the stacked bar graph
    * 
    * @returns {Object} - The transformed data
-   * 
    */
   const transformData = (): { labels: string[]; datasets: any[] } => {
-    const groupedData: GroupedData = logData.reduce((acc: GroupedData, log: LogData) => {
+    const groupedData: GroupedData = logData.reduce((group: GroupedData, log: LogData) => {
       const period = new Date(log.timestamp * 1000).toLocaleDateString();
 
-      if (!acc[period]) {
-        acc[period] = { success: 0, warning: 0, error: 0 };
+      if (!group[period]) {
+        group[period] = { success: 0, warning: 0, error: 0 };
       }
 
       if (log.status === 0) {
-        acc[period].success++;
+        group[period].success++;
       } else if (log.status === 1) {
-        acc[period].warning++;
+        group[period].warning++;
       } else if (log.status === 2) {
-        acc[period].error++;
+        group[period].error++;
       }
 
-      return acc;
+      return group;
     }, {});
 
     const labels = Object.keys(groupedData);
     const datasets = [
       {
         label: 'Success',
-        backgroundColor: 'green',
+        backgroundColor: '#4aa726',
         data: labels.map((period) => groupedData[period].success),
       },
       {
         label: 'Warning',
-        backgroundColor: 'yellow',
+        backgroundColor: '#ffd000',
         data: labels.map((period) => groupedData[period].warning),
       },
       {
         label: 'Error',
-        backgroundColor: 'red',
+        backgroundColor: '#ff0000',
         data: labels.map((period) => groupedData[period].error),
       },
     ];
@@ -94,164 +98,88 @@ const StackedBarGraphComponent = () => {
     return { labels, datasets};
   };
 
-  /** 
-   * Handle the change of page
-   * 
-   * @param {React.MouseEvent<HTMLButtonElement> | null} event - The event of the change
-   * @param {number} newPage - The new page
-   * @returns {void}
-   */
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    setPage(newPage);
-  };
-
-  /** 
-   * Handle the change of rows per page
-   * 
-   * @param {React.ChangeEvent<HTMLInputElement>} event - The event of the change
-   * @returns {void}
-   * 
-   */
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  /** 
-   * Show a table with results paginated and pre-sorted. Date pickers are individual
-   */
-  const showResultsTable = () => {
-    const startIndex = page * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-
-    /** 
-     * Handle the sorting of the table
-     * 
-     * @param {string} column - The column to sort by
-     * @returns {void}
-     * 
-     */
-    const handleSort = (column: string) => {
-      if (column === sortColumn) {
-        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-      } else {
-        setSortColumn(column);
-        setSortDirection('asc');
+  useEffect(() => {
+    const successCount = logData.reduce((count: number, log: LogData) => {
+      if (log.status === 0) {
+        return count + 1;
       }
-    };
+      return count;
+    }, 0);
 
-    /**
-     * Sort the data based on the column and direction
-     * 
-     * @param {string} column - The column to sort by
-     * @param {'asc' | 'desc'} direction - The direction to sort by
-     * @returns {LogData[]} - The sorted data
-     * 
-     */
-    const sortedData = useMemo(() => {
-      let sortedArray = [...logData];
-
-      if (sortColumn) {
-        sortedArray.sort((a, b) => {
-          const aValue = a[sortColumn];
-          const bValue = b[sortColumn];
-
-          if (aValue < bValue) {
-            return sortDirection === 'asc' ? -1 : 1;
-          }
-          if (aValue > bValue) {
-            return sortDirection === 'asc' ? 1 : -1;
-          }
-          return 0;
-        });
+    const warningCount = logData.reduce((count: number, log: LogData) => {
+      if (log.status === 1) {
+        return count + 1;
       }
+      return count;
+    }, 0);
 
-      return sortedArray;
-    }, [logData, sortColumn, sortDirection]);
+    const errorCount = logData.reduce((count: number, log: LogData) => {
+      if (log.status === 2) {
+        return count + 1;
+      }
+      return count;
+    }, 0);
 
-    return (
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell onClick={() => handleSort('timestamp')}>Date/Time</TableCell>
-              <TableCell onClick={() => handleSort('url')}>URL</TableCell>
-              <TableCell onClick={() => handleSort('issue_description')}>Issue Description</TableCell>
-              <TableCell onClick={() => handleSort('status')}>Status</TableCell>
-              <TableCell onClick={() => handleSort('response_time')}>Response Time</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sortedData.slice(startIndex, endIndex).map((log: LogData, index: number) => (
-              <TableRow key={index}>
-                <TableCell>{new Date(log.timestamp * 1000).toLocaleString('en-GB', { hour12: true })}</TableCell>
-                <TableCell>{log.url.slice(19)}</TableCell>
-                <TableCell>{log.issue_description && <div className='issue-desc'>{log.issue_description}</div>}</TableCell>
-                <TableCell>
-                  <span
-                    className={`${styles.box} ${styles.status} ${
-                      log.status === 1 ? styles.statusWarning : log.status === 2 ? styles.statusError : '' ? log.status : styles.statusNone
-                    }`}
-                  ></span>
-                </TableCell>
-                <TableCell>{log.response_time}ms</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 50]}
-          component="div"
-          count={logData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
-    );
-  };
+    setSummarizedData({ success: successCount, warning: warningCount, error: errorCount });
+  }, [logData]);
 
   return (
     <div>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker
-          label="Start Date"
-          value={startDate}
-          minDate={firstEntryTime}
-          maxDate={lastEntryTime}
-          onChange={(newValue) => setStartDate(newValue)}
-        />
-        <DatePicker
-          label="End Date"
-          value={endDate}
-          minDate={firstEntryTime}
-          maxDate={lastEntryTime}
-          onChange={(newValue) => setEndDate(newValue)}
-        />
-      </LocalizationProvider>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={12} lg={12}>
+          <Heading
+            type={'h1'}
+            text={'Dashboard'}
+            className={styles.heading}
+          />
+        </Grid>
 
-      <Bar
-        data={{
-          labels: transformData().labels,
-          datasets: transformData().datasets,
-        }}
-        width={'900px'}
-        height={'100%'}
-        options={{
-          maintainAspectRatio: true,
-          aspectRatio: 2,
-          scales: {
-            x: { stacked: true },
-            y: { stacked: true },
-          },
-          plugins: {
-            legend: { position: 'top' },
-          },
-        }}
-      />
+        <Grid item xs={12} lg={12} mb={4}>
+          <Heading type={'h4'} text={'Select by date'} />
+          <StartEndDatepicker
+            startDate={startDate}
+            endDate={endDate}
+            firstEntryDate={firstEntryDate}
+            lastEntryDate={lastEntryDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+          />
+        </Grid>
 
-      {showResultsTable()}
+        <Grid item xs={12} md={12} lg={8} mb={4}>
+          <Heading type={'h4'} text={'Results by date'} />
+          <Bar
+            className={styles.barGraph}
+            data={{
+              labels: transformData().labels,
+              datasets: transformData().datasets,
+            }}
+            width={'900px'}
+            height={'100%'}
+            options={{
+              maintainAspectRatio: true,
+              aspectRatio: 2,
+              scales: {
+                x: { stacked: true },
+                y: { stacked: true },
+              },
+              plugins: {
+                legend: { position: 'top' },
+              },
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={12} lg={4} alignSelf={'stretch'} mb={4}>
+          <Heading type={'h4'} text={'Results Summary'} />
+          <ResultsSummarized data={summarizedData} />
+        </Grid>
+
+        <Grid item xs={12} md={12} lg={12}>
+          <Heading type={'h4'} text={'Table of contents'} />
+          <ResultsTable logData={logData} />
+        </Grid>
+      </Grid>
     </div>
   );
 };

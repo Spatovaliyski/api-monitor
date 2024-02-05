@@ -15,27 +15,10 @@
   }
 }
 
-.status {
-  border: 1px solid transparent;
-}
-
-.box {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  border-radius: 50%;
-  line-height: 1;
-  margin: 0 1em 0 0;
-}
-
-.statusNone {
-  background-color: green;
-}
-
-.statusWarning {
-  background-color: yellow;
-}
-
-.statusError {
-  background-color: red;
+.barGraph {
+  background-color: white;
+  padding: 2em;
+  margin-bottom: 1em;
+  border-radius: 12px;
+  border: 1px solid var(--color-main-border);
 }

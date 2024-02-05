@@ -1,0 +1,57 @@
+
+.summarizedTable {
+  display: flex;
+  flex-flow: column wrap;
+  gap: 1em;
+}
+
+.summarizedRow {
+  background-color: white;
+  border: 1px solid var(--color-main-border);
+  border-radius: 12px;
+  padding: 1em 1.5em 1em 1.5em;
+  display: flex;  
+  align-items: center;
+  justify-content: space-between;
+
+
+  div {
+    font-weight: bold;
+  }
+}
+
+.summarizedTitle {
+  display: flex;
+  align-items: center;
+  gap: 1.5em;
+
+  p {
+    display: flex;
+    flex-flow: column wrap;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: .25rem;
+  }
+
+  span  {
+    font-size: .85rem;
+    font-weight: 400;
+    color: var(--color-secondary);
+  }
+
+  svg {
+    font-size: 2rem;
+  }
+}
+
+.colorSuccess {
+  color: var(--color-success);
+}
+
+.colorWarning {
+  color: var(--color-warning);
+}
+
+.colorError {
+  color: var(--color-error);
+}

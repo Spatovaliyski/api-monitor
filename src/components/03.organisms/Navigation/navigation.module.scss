@@ -1,0 +1,49 @@
+.navigation {
+  display: flex;
+  flex-flow: column wrap;
+  padding: 0;
+  margin: 0;
+
+  ul {
+    padding: 0;
+  }
+}
+
+.navigationItem {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: .5rem;
+  color: var(--color-grayed);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid transparent;
+
+  svg {
+    font-size: 20px;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 600;
+    display: block;
+    width: 100%;
+  
+    &:hover {
+      color: inherit;
+    }
+  }
+
+  &:not(.active):hover {
+    border: 1px solid var(--color-main-border);
+    color: var(--color-primary);
+  }
+}
+
+.active {
+  background-color: white;
+  border: 1px solid var(--color-main-border);
+  color: var(--color-primary);
+}
