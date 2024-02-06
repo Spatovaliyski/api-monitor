@@ -19,6 +19,7 @@ Chart.register(CategoryScale);
 
 const Dashboard = () => {
   const [logData, setLogData] = useState<LogData[]>([]);
+  const [fetchedData, setFetchedata] = useState<LogData[]>([]);
   const [firstEntryDate, setFirstEntryDate] = useState<Dayjs>(dayjs('1969-01-01'));
   const [lastEntryDate, setLastEntryDate] = useState<Dayjs>(dayjs('2100-01-01'));
   const [startDate, setStartDate] = useState<Dayjs>(dayjs('2024-01-01'));
@@ -35,7 +36,8 @@ const Dashboard = () => {
    * @returns {void}
    */
   useEffect(() => {
-    service.getItems().then((res) => {
+    const fetchData = async () => {
+      const res = await service.getItems();
       const filteredData = res.data.filter((log: LogData) => {
         const logDate = log.timestamp;
         const startTimestamp = startDate?.toDate().getTime() ?? 0;
@@ -47,8 +49,28 @@ const Dashboard = () => {
       setFirstEntryDate(dayjs(res.data[0].timestamp * 1000));
       setLastEntryDate(dayjs(res.data[res.data.length - 1].timestamp * 1000));
 
+      setFetchedata(filteredData);
       setLogData(filteredData);
+    };
+
+    fetchData();
+  }, []);
+
+  /** 
+   * Filter the data based on the date range
+   * 
+   * @returns {void}
+  */
+  useEffect(() => {
+    const data = fetchedData.filter((log: LogData) => {
+      const logDate = log.timestamp;
+      const startTimestamp = startDate?.toDate().getTime() ?? 0;
+      const endTimestamp = endDate?.toDate().getTime() ?? 0;
+
+      return logDate >= startTimestamp / 1000 && logDate <= endTimestamp / 1000;
     });
+
+    setLogData(data);
   }, [startDate, endDate]);
 
   /**
