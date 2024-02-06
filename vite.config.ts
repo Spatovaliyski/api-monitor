@@ -15,5 +15,8 @@ export default defineConfig({
       '@templates': path.resolve(__dirname, 'src/components/04.templates'),
       '@pages': path.resolve(__dirname, 'src/components/05.pages'),
     }
+  },
+  build:{
+    outDir: "build"
   }
 })
