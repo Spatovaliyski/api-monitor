@@ -55,7 +55,7 @@
   flex-flow: row;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1460px) {
   .site-main {
     flex-flow: column;
   }
@@ -70,7 +70,7 @@
   padding: 0 1.5em;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1460px) {
   .sidebar {
     display: none;
   }
