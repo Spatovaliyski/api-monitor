@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 
 import styles from './results-table.module.scss'
 import EnhancedTableHead from '@organisms/Tables/SortableTableHead/sortable-table-head.component';
+import ResponseCode from '@atoms/ResponseCodes/response-codes.component';
 
 const ResultsTable = ({ logData }: LogData) => {
   const [page, setPage] = useState(0);
@@ -80,6 +81,14 @@ const ResultsTable = ({ logData }: LogData) => {
     return sortedArray;
   }, [logData, sortColumn, sortDirection]);
   
+  /**
+   * The head cells for the table
+   * 
+   * @type {any}
+   * @property {string} id - The id of the cell
+   * @property {string} label - The label of the cell
+   * @returns {void}
+   */
   const headCells : any = [
     { id: 'timestamp', label: 'Date/Time' },
     { id: 'url', label: 'URL' },
@@ -88,36 +97,6 @@ const ResultsTable = ({ logData }: LogData) => {
     { id: 'status', label: 'Status' },
     { id: 'response_time', label: 'Response Time' },
   ];
-
-  const setIssueType = (issueType: number) => {
-    let code = '';
-
-    switch (issueType) {
-      case 0:
-        code = 'Missing Parameter';
-        break;
-      case 1:
-        code = 'Rate limit exceeded';
-        break;
-      case 2:
-        code = 'Not Found';
-        break;
-      case 3:
-        code = 'Unknown Parameter';
-        break;
-      case 4:
-        code = 'Deprecated';
-        break;
-      case 5:
-        code = 'Unsecure';
-        break;
-      default:
-        code = '';
-        break;
-    }
-
-    return code;
-  }
 
   return (
     <Grid container spacing={2}>
@@ -137,7 +116,7 @@ const ResultsTable = ({ logData }: LogData) => {
                 <TableRow key={index}>
                   <TableCell>{new Date(log.timestamp * 1000).toLocaleString('en-GB', { hour12: true })}</TableCell>
                   <TableCell>{log.url.slice(19)}</TableCell>
-                  <TableCell>{log.issue_type && <div className='issue-desc'>{setIssueType(log.issue_type)}</div>}</TableCell>
+                  <TableCell>{log.issue_type != null && <div className='issue-desc'><ResponseCode respCode={log.issue_type} /></div>}</TableCell>
                   <TableCell>{log.issue_description && <div className='issue-desc'>{log.issue_description}</div>}</TableCell>
                   <TableCell>
                     <span
