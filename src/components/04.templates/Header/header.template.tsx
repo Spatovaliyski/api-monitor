@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <Container>
-        <h1 className={styles.headerTitle}>Martin`s super <strike>advanced</strike>&nbsp;simple API monitor!</h1>
+        <h1 className={styles.headerTitle}>Martin`s super simple API monitor!</h1>
       </Container>
     </header>
   )
