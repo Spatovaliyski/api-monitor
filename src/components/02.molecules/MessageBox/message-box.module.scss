@@ -1,0 +1,25 @@
+.messageBox {
+  padding: 1em;
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  svg {
+    font-size: 30px;
+  }
+}
+
+.boxTypeNeutral {
+  border-color: var(--color-main-border);
+}
+
+.boxTypeWarning {
+  border-color: var(--color-warning);
+}
+
+.boxTypeError {
+  border-color: var(--color-error);
+
+  svg {
+    color: var(--color-error);
+  }
+}

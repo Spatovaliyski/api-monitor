@@ -4,6 +4,7 @@ import { LogData } from './results-table.type'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Grid } from '@mui/material'
 
 import styles from './results-table.module.scss'
+import EnhancedTableHead from '@organisms/Tables/SortableTableHead/sortable-table-head.component';
 
 const ResultsTable = ({ logData }: LogData) => {
   const [page, setPage] = useState(0);
@@ -33,99 +34,138 @@ const ResultsTable = ({ logData }: LogData) => {
     setPage(0);
   };
 
-    const startIndex = page * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
+  const startIndex = page * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
 
-    /** 
-     * Handle the sorting of the table
-     * 
-     * @param {string} column - The column to sort by
-     * @returns {void}
-     */
-    const handleSort = (column: string) => {
-      if (column === sortColumn) {
-        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-      } else {
-        setSortColumn(column);
-        setSortDirection('asc');
-      }
-    };
-
-    /**
-     * Sort the data based on the column and direction
-     * 
-     * @param {string} column - The column to sort by
-     * @param {'asc' | 'desc'} direction - The direction to sort by
-     * @returns {LogData[]} - The sorted data
-     */
-    const sortedData = useMemo(() => {
-      let sortedArray = [...logData];
-
-      if (sortColumn) {
-        sortedArray.sort((a : any, b : any) => {
-          const aValue = a[sortColumn];
-          const bValue = b[sortColumn];
-
-          if (aValue < bValue) {
-            return sortDirection === 'asc' ? -1 : 1;
-          }
-          if (aValue > bValue) {
-            return sortDirection === 'asc' ? 1 : -1;
-          }
-          return 0;
-        });
-      }
-
-      return sortedArray;
-    }, [logData, sortColumn, sortDirection]);
-
-    return (
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TableContainer component={Paper} className={styles.resultsTable}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell onClick={() => handleSort('timestamp')}>Date/Time</TableCell>
-                  <TableCell onClick={() => handleSort('url')}>URL</TableCell>
-                  <TableCell onClick={() => handleSort('issue_description')}>Issue Description</TableCell>
-                  <TableCell onClick={() => handleSort('status')}>Status</TableCell>
-                  <TableCell onClick={() => handleSort('response_time')}>Response Time</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedData.slice(startIndex, endIndex).map((log, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{new Date(log.timestamp * 1000).toLocaleString('en-GB', { hour12: true })}</TableCell>
-                    <TableCell>{log.url.slice(19)}</TableCell>
-                    <TableCell>{log.issue_description && <div className='issue-desc'>{log.issue_description}</div>}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`${styles.box} ${styles.status} ${
-                          log.status === 1 ? styles.statusWarning : log.status === 2 ? styles.statusError : '' ? log.status : styles.statusNone
-                        }`}
-                      >
-                        {log.status === 1 ? 'Warning' : log.status === 2 ? 'Error' : 'OK'}
-                      </span>
-                    </TableCell>
-                    <TableCell>{log.response_time}ms</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 50]}
-              component="div"
-              count={logData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableContainer>
-        </Grid>
-      </Grid>
-    );
+  /** 
+   * Handle the sorting of the table
+   * 
+   * @param {string} column - The column to sort by
+   * @returns {void}
+   */
+  const handleSort = (column: string) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
   };
+
+  /**
+   * Sort the data based on the column and direction
+   * 
+   * @param {string} column - The column to sort by
+   * @param {'asc' | 'desc'} direction - The direction to sort by
+   * @returns {LogData[]} - The sorted data
+   */
+  const sortedData = useMemo(() => {
+    let sortedArray = [...logData];
+
+    if (sortColumn) {
+      sortedArray.sort((a : any, b : any) => {
+        const aValue = a[sortColumn];
+        const bValue = b[sortColumn];
+
+        if (aValue < bValue) {
+          return sortDirection === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortDirection === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    return sortedArray;
+  }, [logData, sortColumn, sortDirection]);
+  
+  const headCells : any = [
+    { id: 'timestamp', label: 'Date/Time' },
+    { id: 'url', label: 'URL' },
+    { id: 'issue_type', label: 'Issue Type' },
+    { id: 'issue_description', label: 'Issue Description' },
+    { id: 'status', label: 'Status' },
+    { id: 'response_time', label: 'Response Time' },
+  ];
+
+  const setIssueType = (issueType: number) => {
+    let code = '';
+
+    switch (issueType) {
+      case 0:
+        code = 'Missing Parameter';
+        break;
+      case 1:
+        code = 'Rate limit exceeded';
+        break;
+      case 2:
+        code = 'Not Found';
+        break;
+      case 3:
+        code = 'Unknown Parameter';
+        break;
+      case 4:
+        code = 'Deprecated';
+        break;
+      case 5:
+        code = 'Unsecure';
+        break;
+      default:
+        code = '';
+        break;
+    }
+
+    return code;
+  }
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <TableContainer component={Paper} className={styles.resultsTable}>
+          <Table>
+            <EnhancedTableHead
+              cells={headCells}
+              order={sortDirection}
+              orderBy={sortColumn}
+              onRequestSort={(event, column) => handleSort(column)}
+              numSelected={0} // Add the missing numSelected prop
+              rowCount={sortedData.length} // Add the missing rowCount prop
+            />
+            <TableBody>
+              {sortedData.slice(startIndex, endIndex).map((log, index) => (
+                <TableRow key={index}>
+                  <TableCell>{new Date(log.timestamp * 1000).toLocaleString('en-GB', { hour12: true })}</TableCell>
+                  <TableCell>{log.url.slice(19)}</TableCell>
+                  <TableCell>{log.issue_type && <div className='issue-desc'>{setIssueType(log.issue_type)}</div>}</TableCell>
+                  <TableCell>{log.issue_description && <div className='issue-desc'>{log.issue_description}</div>}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`${styles.box} ${styles.status} ${
+                        log.status === 1 ? styles.statusWarning : log.status === 2 ? styles.statusError : '' ? log.status : styles.statusNone
+                      }`}
+                    >
+                      {log.status === 1 ? 'Warning' : log.status === 2 ? 'Error' : 'OK'}
+                    </span>
+                  </TableCell>
+                  <TableCell>{log.response_time}ms</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 50]}
+            component="div"
+            count={logData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      </Grid>
+    </Grid>
+  );
+};
 
 export default ResultsTable

@@ -14,6 +14,7 @@ import StartEndDatepicker from '@molecules/StartEndDatepicker/start-end-datepick
 import Heading from '@organisms/Heading/heading.component';
 import ResultsTable from '@organisms/ResultsTable/results-table.component';
 import ResultsSummarized from '@organisms/ResultsSummarized/results-summarized.component';
+import MessageBox from '@molecules/MessageBox/message-box.component';
 
 // Register the category scale
 Chart.register(CategoryScale);
@@ -80,7 +81,7 @@ const StackedBarGraphComponent = () => {
     const datasets = [
       {
         label: 'Success',
-        backgroundColor: '#4aa726',
+        backgroundColor: '#65d6bd',
         data: labels.map((period) => groupedData[period].success),
       },
       {
@@ -90,7 +91,7 @@ const StackedBarGraphComponent = () => {
       },
       {
         label: 'Error',
-        backgroundColor: '#ff0000',
+        backgroundColor: '#ff603f',
         data: labels.map((period) => groupedData[period].error),
       },
     ];
@@ -133,6 +134,15 @@ const StackedBarGraphComponent = () => {
             className={styles.heading}
           />
         </Grid>
+        
+        <Grid item xs={12} md={12} lg={8} mb={4}>
+          <MessageBox
+            title={'Note from the developer'}
+            text={`A more abstract implementation for the date picker is to use a date range picker. This wasn't done here, due the paid plan for MUI and the intention to stick to a single framework. To compensate, some validation logic was implemented to the normal datepicker`}
+            type={'warning'}
+          />
+        </Grid>
+
 
         <Grid item xs={12} lg={12} mb={4}>
           <Heading type={'h4'} text={'Select by date'} />

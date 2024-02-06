@@ -16,9 +16,11 @@
   --color-secondary: #616795;
   --color-main-border: #e2e3ed;
   --color-grayed: #666;
+  --color-light: #b3b3b3;
   --color-success: #65d6bd;
   --color-warning: #ffd000;
   --color-error: #ff603f;
+  --color-black: #111;
 }
 
 a {

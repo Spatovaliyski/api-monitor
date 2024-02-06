@@ -10,7 +10,7 @@ const ResultsSummarized = ({ data }: any) => {
           <CiCircleCheck className={styles.colorSuccess} />
           <aside className={styles.summarizedTitleAside}>
             <p>Successes:</p>
-            <span>Amount of successful requests</span>
+            <span>Total amount of successful requests</span>
           </aside>
         </div>
         <div className={styles.summarizedData}>{data.success}</div>
@@ -21,7 +21,7 @@ const ResultsSummarized = ({ data }: any) => {
           <CiWarning className={styles.colorWarning} />
           <aside className={styles.summarizedTitleAside}>
             <p>Warnings:</p>
-            <span>Amount of warnings in our requests</span>
+            <span>Total amount of warnings</span>
           </aside>
         </div>
         <div className={styles.summarizedData}>{data.warning}</div>
@@ -32,7 +32,7 @@ const ResultsSummarized = ({ data }: any) => {
           <CiCircleRemove className={styles.colorError} />
           <aside className={styles.summarizedTitleAside}>
             <p>Errors:</p>
-            <span>Amount of fatal errors </span>
+            <span>Total amount of fatal errors </span>
           </aside>
         </div>
         <div className={styles.summarizedData}>{data.error}</div>

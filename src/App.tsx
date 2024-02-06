@@ -18,6 +18,7 @@ function App() {
       <main className="site-main">
         <aside className="sidebar">
           <Heading className={'menu-heading'} type={'h4'} text={'Menu'} />
+          {/** For the purposes of visual demonstration. No Routing actually implemented. */}
           <Navigation>
             <NavigationItem className={NavStyles.active} href={'/'} label={'Dashboard'} icon={<RxDashboard />} />
             <NavigationItem href={'/logs'} label={'Logs'} icon={<RxActivityLog />} />

@@ -52,7 +52,13 @@
 
 .site-main {
   display: flex;
-  flex-direction: row wrap;
+  flex-flow: row wrap;
+}
+
+@media (max-width: 1200px) {
+  .site-main {
+    flex-flow: column
+  }
 }
 
 .sidebar {
@@ -62,6 +68,12 @@
   width: 100%;
   background: #f1f1f1;
   padding: 0 1.5em;
+}
+
+@media (max-width: 1200px) {
+  .sidebar {
+    display: none;
+  }
 }
 
 .menu-heading {
