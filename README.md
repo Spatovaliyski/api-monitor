@@ -4,4 +4,4 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 This project utilizes MUI (The free one )for its data visualisation. Several components are modified versions to achieve certain logical implementations.
 
-Demo: TBD
+Demo: https://spatovaliyski.github.io/api-monitor/
