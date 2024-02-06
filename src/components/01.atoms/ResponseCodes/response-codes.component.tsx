@@ -7,7 +7,7 @@
  * @example
  * <ResponseCode respCode={0} />
  */
-const ResponseCode = ({ respCode }: { respCode: number }) => {
+const ResponseCode = ({ respCode }: { respCode: number | undefined }) => {
   let code = '';
 
   switch (respCode) {

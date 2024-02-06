@@ -12,11 +12,11 @@ const ResultsTable = ({ logData }: LogData) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [filterStatus, setFilterStatus] = useState<number>(0);
-  const [filterIssueType, setFilterIssueType] = useState<number>(0);
+  const [filterStatus, setFilterStatus] = useState<number>();
+  const [filterIssueType, setFilterIssueType] = useState<number>();
   const [filterURL, setFilterURL] = useState('');
-  const [filterResponseTimeMin, setFilterResponseTimeMin] = useState();
-  const [filterResponseTimeMax, setFilterResponseTimeMax] = useState();
+  const [filterResponseTimeMin, setFilterResponseTimeMin] = useState<number>(0);
+  const [filterResponseTimeMax, setFilterResponseTimeMax] = useState<number>(0);
 
   /** 
    * Handle the change of page
@@ -86,14 +86,8 @@ const ResultsTable = ({ logData }: LogData) => {
     return sortedArray;
   }, [logData, sortColumn, sortDirection]);
 
-  /**
-   * Get unique values for a given attribute from the log data
-   * 
-   * @param {string} attribute - The attribute to get unique values for
-   * @returns {string[]} - The unique values
-   */
-  const getUniqueValues = (attribute: string) => {
-    const uniqueValues = [...new Set(logData.map((log) => log[attribute]))];
+  const getUniqueValues = (attribute: keyof LogData['logData'][number]) => {
+    const uniqueValues = Array.from(new Set(logData.map((log) => log[attribute])));
     return uniqueValues.filter((value) => value !== null && value !== undefined);
   };
 
@@ -103,14 +97,25 @@ const ResultsTable = ({ logData }: LogData) => {
    * @returns {string[]} - The unique URLs
    */
   const getUniqueURLs = () => {
-    const uniqueURLs = [...new Set(logData.map((log) => log.url.split('?')[0]))];
-    const sortedUniqueURLs = uniqueURLs
-      .filter((url) => url !== null && url !== undefined)
-      .sort((a, b) => {
-        const urlA = parseInt(a.match(/\d+/)?.[0]) || 0; // Extract numerical part, default to 0 if not found
-        const urlB = parseInt(b.match(/\d+/)?.[0]) || 0;
-        return urlA - urlB;
-      });
+    const uniqueURLsMap: { [url: string]: boolean } = {}; // Use an object as a map to store unique URLs
+    const sortedUniqueURLs: string[] = [];
+
+    // Iterate through logData and extract unique URLs
+    logData.forEach((log) => {
+      const urlWithoutParams = log.url.split('?')[0];
+      if (!uniqueURLsMap[urlWithoutParams]) {
+        uniqueURLsMap[urlWithoutParams] = true; // Mark URL as encountered
+        sortedUniqueURLs.push(urlWithoutParams);
+      }
+    });
+
+    // Sort the unique URLs
+    sortedUniqueURLs.sort((a, b) => {
+      const urlA = parseInt(a.match(/\d+/)?.[0] ?? '') || 0; // Extract numerical part, default to 0 if not found
+      const urlB = parseInt(b.match(/\d+/)?.[0] ?? '') || 0; // Extract numerical part, default to 0 if not found
+      return urlA - urlB;
+    });
+
     return sortedUniqueURLs;
   };
 
@@ -140,7 +145,6 @@ const ResultsTable = ({ logData }: LogData) => {
     let filteredArray = [...sortedData];
 
     if (filterStatus || filterStatus === 0) {
-      console.log(filterStatus);
       filteredArray = filteredArray.filter((log) => log.status === filterStatus);
     }
 
@@ -153,7 +157,7 @@ const ResultsTable = ({ logData }: LogData) => {
     }
 
     if (filterResponseTimeMin && filterResponseTimeMax) {
-      filteredArray = filteredArray.filter((log) => log.response_time >= parseInt(filterResponseTimeMin) && log.response_time <= parseInt(filterResponseTimeMax));
+      filteredArray = filteredArray.filter((log) => log.response_time >= filterResponseTimeMin && log.response_time <= filterResponseTimeMax);
     }
 
     return filteredArray;
@@ -185,7 +189,7 @@ const ResultsTable = ({ logData }: LogData) => {
             >
               <MenuItem value="">All</MenuItem>
               {getUniqueValues('issue_type').map((issueType) => (
-                <MenuItem key={issueType} value={issueType}>{<ResponseCode respCode={issueType} />}</MenuItem>
+                <MenuItem key={issueType} value={issueType}>{<ResponseCode respCode={Number(issueType)} />}</MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -207,7 +211,7 @@ const ResultsTable = ({ logData }: LogData) => {
           <FormControl variant="outlined" className={styles.filterControl}>
             <TextField
               value={filterResponseTimeMin}
-              onChange={(event) => setFilterResponseTimeMin(event.target.value)}
+              onChange={(event) => setFilterResponseTimeMin(Number(event.target.value))}
               label="Response Time (min)"
             />
           </FormControl>
@@ -215,7 +219,7 @@ const ResultsTable = ({ logData }: LogData) => {
             
             <TextField
               value={filterResponseTimeMax}
-              onChange={(event) => setFilterResponseTimeMax(event.target.value)}
+              onChange={(event) => setFilterResponseTimeMax(Number(event.target.value))}
               label="Response Time (max)"
             />
           </FormControl>
