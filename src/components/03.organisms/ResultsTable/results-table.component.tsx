@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 
 import { LogData } from './results-table.type'
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Grid } from '@mui/material'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Grid, Button, MenuItem, Select, FormControl, InputLabel, TextField } from '@mui/material'
 
 import styles from './results-table.module.scss'
 import EnhancedTableHead from '@organisms/Tables/SortableTableHead/sortable-table-head.component';
@@ -12,6 +12,11 @@ const ResultsTable = ({ logData }: LogData) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [filterStatus, setFilterStatus] = useState<number>(0);
+  const [filterIssueType, setFilterIssueType] = useState<number>(0);
+  const [filterURL, setFilterURL] = useState('');
+  const [filterResponseTimeMin, setFilterResponseTimeMin] = useState();
+  const [filterResponseTimeMax, setFilterResponseTimeMax] = useState();
 
   /** 
    * Handle the change of page
@@ -80,7 +85,35 @@ const ResultsTable = ({ logData }: LogData) => {
 
     return sortedArray;
   }, [logData, sortColumn, sortDirection]);
-  
+
+  /**
+   * Get unique values for a given attribute from the log data
+   * 
+   * @param {string} attribute - The attribute to get unique values for
+   * @returns {string[]} - The unique values
+   */
+  const getUniqueValues = (attribute: string) => {
+    const uniqueValues = [...new Set(logData.map((log) => log[attribute]))];
+    return uniqueValues.filter((value) => value !== null && value !== undefined);
+  };
+
+  /**
+   * Get unique URLs without query parameters from the log data
+   * 
+   * @returns {string[]} - The unique URLs
+   */
+  const getUniqueURLs = () => {
+    const uniqueURLs = [...new Set(logData.map((log) => log.url.split('?')[0]))];
+    const sortedUniqueURLs = uniqueURLs
+      .filter((url) => url !== null && url !== undefined)
+      .sort((a, b) => {
+        const urlA = parseInt(a.match(/\d+/)?.[0]) || 0; // Extract numerical part, default to 0 if not found
+        const urlB = parseInt(b.match(/\d+/)?.[0]) || 0;
+        return urlA - urlB;
+      });
+    return sortedUniqueURLs;
+  };
+
   /**
    * The head cells for the table
    * 
@@ -98,8 +131,96 @@ const ResultsTable = ({ logData }: LogData) => {
     { id: 'response_time', label: 'Response Time' },
   ];
 
+  /**
+   * Apply the selected filters to the data
+   * 
+   * @returns {LogData[]} - The filtered data
+   */
+  const filteredData = useMemo(() => {
+    let filteredArray = [...sortedData];
+
+    if (filterStatus || filterStatus === 0) {
+      console.log(filterStatus);
+      filteredArray = filteredArray.filter((log) => log.status === filterStatus);
+    }
+
+    if (filterIssueType || filterIssueType === 0) {
+      filteredArray = filteredArray.filter((log) => log.issue_type === filterIssueType);
+    }
+
+    if (filterURL) {
+      filteredArray = filteredArray.filter((log) => log.url.includes(filterURL));
+    }
+
+    if (filterResponseTimeMin && filterResponseTimeMax) {
+      filteredArray = filteredArray.filter((log) => log.response_time >= parseInt(filterResponseTimeMin) && log.response_time <= parseInt(filterResponseTimeMax));
+    }
+
+    return filteredArray;
+  }, [sortedData, filterStatus, filterIssueType, filterURL, filterResponseTimeMin, filterResponseTimeMax]);
+
   return (
     <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <div className={styles.filterContainer}>
+          <FormControl variant="outlined" className={styles.filterControl}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={filterStatus}
+              onChange={(event) => setFilterStatus(event.target.value as number)}
+              label="Status"
+            >
+              <MenuItem value="">All</MenuItem>
+              {getUniqueValues('status').map((status) => (
+                <MenuItem key={status} value={status}>{status === 0 ? 'OK' : status === 1 ? 'Warning' : status === 2 ? 'Error' : ''}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl variant="outlined" className={styles.filterControl}>
+            <InputLabel>Issue Type</InputLabel>
+            <Select
+              value={filterIssueType}
+              onChange={(event) => setFilterIssueType(event.target.value as number)}
+              label="Issue Type"
+            >
+              <MenuItem value="">All</MenuItem>
+              {getUniqueValues('issue_type').map((issueType) => (
+                <MenuItem key={issueType} value={issueType}>{<ResponseCode respCode={issueType} />}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl variant="outlined" className={styles.filterControl}>
+            <InputLabel>URL</InputLabel>
+              <Select
+                value={filterURL}
+                onChange={(event) => setFilterURL(event.target.value as string)}
+                label="URL"
+              >
+                <MenuItem value="">All</MenuItem>
+                {getUniqueURLs().map((url) => (
+                  <MenuItem key={url} value={url}>
+                    {url}
+                  </MenuItem>
+                ))}
+              </Select>
+          </FormControl>
+          <FormControl variant="outlined" className={styles.filterControl}>
+            <TextField
+              value={filterResponseTimeMin}
+              onChange={(event) => setFilterResponseTimeMin(event.target.value)}
+              label="Response Time (min)"
+            />
+          </FormControl>
+          <FormControl variant="outlined" className={styles.filterControl}>
+            
+            <TextField
+              value={filterResponseTimeMax}
+              onChange={(event) => setFilterResponseTimeMax(event.target.value)}
+              label="Response Time (max)"
+            />
+          </FormControl>
+        </div>
+      </Grid>
       <Grid item xs={12}>
         <TableContainer component={Paper} className={styles.resultsTable}>
           <Table>
@@ -109,10 +230,10 @@ const ResultsTable = ({ logData }: LogData) => {
               orderBy={sortColumn}
               onRequestSort={(event, column) => handleSort(column)}
               numSelected={0} // Add the missing numSelected prop
-              rowCount={sortedData.length} // Add the missing rowCount prop
+              rowCount={filteredData.length} // Add the missing rowCount prop
             />
             <TableBody>
-              {sortedData.slice(startIndex, endIndex).map((log, index) => (
+              {filteredData.slice(startIndex, endIndex).map((log, index) => (
                 <TableRow key={index}>
                   <TableCell>{new Date(log.timestamp * 1000).toLocaleString('en-GB', { hour12: true })}</TableCell>
                   <TableCell>{log.url.slice(19)}</TableCell>
@@ -121,7 +242,10 @@ const ResultsTable = ({ logData }: LogData) => {
                   <TableCell>
                     <span
                       className={`${styles.box} ${styles.status} ${
-                        log.status === 1 ? styles.statusWarning : log.status === 2 ? styles.statusError : '' ? log.status : styles.statusNone
+                        log.status === 0 ? styles.statusNone :
+                        log.status === 1 ? styles.statusWarning :
+                        log.status === 2 ? styles.statusError :
+                        styles.statusNone
                       }`}
                     >
                       {log.status === 1 ? 'Warning' : log.status === 2 ? 'Error' : 'OK'}
@@ -135,7 +259,7 @@ const ResultsTable = ({ logData }: LogData) => {
           <TablePagination
             rowsPerPageOptions={[10, 25, 50]}
             component="div"
-            count={logData.length}
+            count={filteredData.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

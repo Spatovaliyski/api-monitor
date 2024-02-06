@@ -42,3 +42,12 @@
   background-color: var(--color-error);
   color: hsl(0, 84%, calc(var(--color-error) - 5%));
 }
+
+.filterContainer {
+  display: flex;
+  gap: 1em;
+
+ & > div {
+  flex: 1;
+ }
+}
