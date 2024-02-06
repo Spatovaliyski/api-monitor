@@ -250,7 +250,7 @@ const ResultsTable = ({ logData }: LogData) => {
                   <TableCell>{new Date(log.timestamp * 1000).toLocaleString('en-GB', { hour12: true })}</TableCell>
                   <TableCell>{log.url.slice(19)}</TableCell>
                   <TableCell>{log.issue_type != null && <div className='issue-desc'><ResponseCode respCode={log.issue_type} /></div>}</TableCell>
-                  <TableCell>{log.issue_description && <div className='issue-desc'>{log.issue_description}</div>}</TableCell>
+                  <TableCell >{log.issue_description && <div className='issue-desc'>{log.issue_description}</div>}</TableCell>
                   <TableCell>
                     <span
                       className={`${styles.box} ${styles.status} ${
@@ -283,4 +283,4 @@ const ResultsTable = ({ logData }: LogData) => {
   );
 };
 
-export default ResultsTable
+export default ResultsTable;

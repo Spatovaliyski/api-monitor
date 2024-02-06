@@ -1,8 +1,6 @@
 .resultsTable {
-  border-radius: 12px;
-  width: 100%;
   max-width: 100%;
-  overflow: hidden;
+  border-radius: 12px;
   box-shadow: none;
   border: 1px solid var(--color-main-border);
   box-shadow: none !important; // Overwrites, absolutely no shadows here

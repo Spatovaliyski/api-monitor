@@ -52,17 +52,17 @@
 
 .site-main {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row;
 }
 
 @media (max-width: 1200px) {
   .site-main {
-    flex-flow: column
+    flex-flow: column;
   }
 }
 
 .sidebar {
-  flex-basis: 300px;
+  flex: 0 1 300px;
   background-color: white;
   display: block;
   width: 100%;
