@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { LogData, GroupedData } from './dashboard.type';
-import Chart, { CategoryScale, Title } from 'chart.js/auto';
+import Chart, { CategoryScale } from 'chart.js/auto';
 import dayjs, { Dayjs } from 'dayjs';
 
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Box, Grid, Container } from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { Grid } from '@mui/material';
 
 import service from '@lib/services/service';
 import styles from './dashboard.module.scss';
@@ -19,7 +17,7 @@ import MessageBox from '@molecules/MessageBox/message-box.component';
 // Register the category scale
 Chart.register(CategoryScale);
 
-const StackedBarGraphComponent = () => {
+const Dashboard = () => {
   const [logData, setLogData] = useState<LogData[]>([]);
   const [firstEntryDate, setFirstEntryDate] = useState<Dayjs>(dayjs('1969-01-01'));
   const [lastEntryDate, setLastEntryDate] = useState<Dayjs>(dayjs('2100-01-01'));
@@ -143,7 +141,6 @@ const StackedBarGraphComponent = () => {
           />
         </Grid>
 
-
         <Grid item xs={12} lg={12} mb={4}>
           <Heading type={'h4'} text={'Select by date'} />
           <StartEndDatepicker
@@ -194,4 +191,4 @@ const StackedBarGraphComponent = () => {
   );
 };
 
-export default StackedBarGraphComponent;
+export default Dashboard;

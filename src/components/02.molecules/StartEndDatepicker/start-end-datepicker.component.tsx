@@ -1,11 +1,17 @@
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StartEndDatepickerProps } from './start-end-datepicker.type';
 
 import styles from './start-end-datepicker.module.scss'
 
+/** 
+ * The StartEndDatepicker component
+ * 
+ * @param {StartEndDatepickerProps} props - The props of the component
+ * @returns {React.ReactElement} - The component
+ */
 const StartEndDatepicker = ({ startDate,  endDate, firstEntryDate, lastEntryDate, setStartDate, setEndDate }: StartEndDatepickerProps) => {
   const [selectedMinDate, setSelectedMinDate] = useState(firstEntryDate);
   const [selectedMaxDate, setSelectedMaxDate] = useState(lastEntryDate);
@@ -21,7 +27,6 @@ const StartEndDatepicker = ({ startDate,  endDate, firstEntryDate, lastEntryDate
     setStartDate(newValue);
     setSelectedMinDate(newValue); // Validation | Set min date to the new start date
   }
-
 
   /** 
    * Handle the end date change

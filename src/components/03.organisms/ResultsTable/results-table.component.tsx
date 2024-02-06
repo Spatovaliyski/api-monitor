@@ -7,6 +7,14 @@ import styles from './results-table.module.scss'
 import EnhancedTableHead from '@organisms/Tables/SortableTableHead/sortable-table-head.component';
 import ResponseCode from '@atoms/ResponseCodes/response-codes.component';
 
+/** 
+ * The Extensive Results Table. It features a lot of logic, including sorting, filtering and pagination.
+ * Best case: Break down into smaller components, however more logic needs to be triple-checked to make it work. 
+ * Don't hardcode, instead map into chunks for reusability
+ * 
+ * @param {LogData} logData - The log data
+ * @returns {React.ReactElement} - The component
+ */
 const ResultsTable = ({ logData }: LogData) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);

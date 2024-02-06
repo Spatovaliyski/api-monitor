@@ -3,6 +3,12 @@ import { Box, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/materi
 import { EnhancedTableProps, HeadCell, Data } from './sortable-table-head.type';
 import { visuallyHidden } from '@mui/utils';
 
+/** 
+ * MUI Table Head component, resuses part of MUI's EnchancedTableHead, however its slightly modified.
+ * 
+ * @param {EnhancedTableProps} props - The props of the component
+ * @returns {React.ReactElement} - The component
+*/
 const EnhancedTableHead = (props: EnhancedTableProps) => {
   const {
     cells,

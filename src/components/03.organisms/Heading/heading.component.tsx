@@ -2,6 +2,12 @@ import React from 'react'
 import { HeadingProps } from './heading.type';
 import styles from './heading.module.scss';
 
+/** 
+ * Custom Heading with pre-defined classes for styling
+ * 
+ * @param {HeadingProps} props - The props of the component
+ * @returns {React.ReactElement} - The component
+ */
 const Heading = ({ type, text, className }: HeadingProps) => {
   return (
     <div className={styles.heading}>

@@ -2,6 +2,13 @@ import { CiCircleRemove, CiCircleCheck, CiWarning} from "react-icons/ci";
 
 import styles from './results-summarized.module.scss';
 
+/** 
+ * Summarized results box. Very hardcoded, no translations or any of the sort, this grabs a list of 3 data points from an object to fill up the information.
+ * No types defined here
+ * 
+ * @param {any} data - The data to be displayed
+ * @returns {React.ReactElement} - The component
+ */
 const ResultsSummarized = ({ data }: any) => {
   return (
     <div className={styles.summarizedTable}>
