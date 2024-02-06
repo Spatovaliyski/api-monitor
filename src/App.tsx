@@ -20,10 +20,10 @@ function App() {
           <Heading className={'menu-heading'} type={'h4'} text={'Menu'} />
           {/** For the purposes of visual demonstration. No Routing actually implemented. */}
           <Navigation>
-            <NavigationItem className={NavStyles.active} href={'/'} label={'Dashboard'} icon={<RxDashboard />} />
-            <NavigationItem href={'/logs'} label={'Logs'} icon={<RxActivityLog />} />
-            <NavigationItem href={'/settings'} label={'Settings'} icon={<CiSettings />} />
-            <NavigationItem href={'/billing'} label={'Billing'} icon={<CiCreditCard1 />} />
+            <NavigationItem className={NavStyles.active} href={'/api-monitor'} label={'Dashboard'} icon={<RxDashboard />} />
+            <NavigationItem href={'/api-monitor'} label={'Logs'} icon={<RxActivityLog />} />
+            <NavigationItem href={'/api-monitor'} label={'Settings'} icon={<CiSettings />} />
+            <NavigationItem href={'/api-monitor'} label={'Billing'} icon={<CiCreditCard1 />} />
           </Navigation>
         </aside>
 
