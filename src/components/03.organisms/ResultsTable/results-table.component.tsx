@@ -164,7 +164,7 @@ const ResultsTable = ({ logData }: LogData) => {
       filteredArray = filteredArray.filter((log) => log.url.includes(filterURL));
     }
 
-    if (filterResponseTimeMin && filterResponseTimeMax) {
+    if (filterResponseTimeMin || filterResponseTimeMax) {
       filteredArray = filteredArray.filter((log) => log.response_time >= filterResponseTimeMin && log.response_time <= filterResponseTimeMax);
     }
 
